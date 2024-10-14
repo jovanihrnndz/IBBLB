@@ -1,11 +1,12 @@
-import SwiftUI
-import Combine
 import Foundation
+import Combine
 
 class ConferenceViewModel: ObservableObject {
     @Published var conferences: [Conference] = []
     @Published var selectedConferenceSermons: [Sermon] = []
+    @Published var fetchError: Error?
 
+    // Store Combine subscriptions here
     private var cancellables = Set<AnyCancellable>()
 
     // Fetch conferences from the API
@@ -16,8 +17,8 @@ class ConferenceViewModel: ObservableObject {
         }
 
         URLSession.shared.dataTaskPublisher(for: url)
-            .map { $0.data }  // Extract the data
-            .decode(type: [Conference].self, decoder: JSONDecoder())  // Decode into the Conference model
+            .map { $0.data }
+            .decode(type: [Conference].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -41,7 +42,7 @@ class ConferenceViewModel: ObservableObject {
 
         URLSession.shared.dataTaskPublisher(for: url)
             .map { $0.data }
-            .decode(type: [Sermon].self, decoder: JSONDecoder())  // Decode into Sermon model
+            .decode(type: [Sermon].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 switch completion {

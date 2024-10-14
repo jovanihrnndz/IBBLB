@@ -8,11 +8,11 @@
 import Foundation
 
 struct Sermon: Identifiable, Codable {
-    var id: UUID?  // Optional to handle missing UUIDs
+    var id: UUID?
     var title: String
     var description: String
     var pastorName: String
-    var videoURL: URL?
-    var audioURL: URL?
+    var videoURL: URL?  // This holds the YouTube video URL
+    var audioURL: URL?  // This holds the audio file URL
     var thumbnailName: String
 }

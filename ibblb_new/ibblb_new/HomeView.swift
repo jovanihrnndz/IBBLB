@@ -15,10 +15,10 @@ struct HomeView: View {
                 // Banner at the top
                 VStack(spacing: 0) {
                     Color(red: 38/255, green: 38/255, blue: 37/255)
-                        .frame(height: 70)
+                        .frame(height: 60)
                         .edgesIgnoringSafeArea(.top)
 
-                    Image("banner")  // Replace "banner" with the actual image name
+                    Image("banner")
                         .resizable()
                         .scaledToFill()
                         .frame(width: UIScreen.main.bounds.width, height: 100)
@@ -32,17 +32,15 @@ struct HomeView: View {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.sermons) { sermon in
-                            SermonCardView(sermon: sermon)
+                            SermonCardView(sermon: sermon)  // Updated to call SermonCardView
                         }
                     }
                     .padding(.horizontal, 16)
                 }
                 .onAppear {
-                    // Fetch sermons when the view appears
-                    viewModel.fetchSermons()
+                    viewModel.fetchSermons()  // Fetch sermons when the view appears
                 }
             }
-          
         }
     }
 }

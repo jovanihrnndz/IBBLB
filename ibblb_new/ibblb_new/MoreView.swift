@@ -11,7 +11,7 @@ struct MoreView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Add the banner at the top
-            BannerView()
+            BannerView(imageName: "banner", height: 100)
             
             // Main content below the banner
             List {

@@ -7,50 +7,78 @@
 import SwiftUI
 
 struct SermonCardView: View {
-    var sermon: Sermon
-
+    let sermon: Sermon
+    
     var body: some View {
         VStack(alignment: .leading) {
-            Image(sermon.thumbnailName)
-                .resizable()
-                .scaledToFill()
-                .frame(width: UIScreen.main.bounds.width - 40, height: 200)
-                .clipped()
-                .cornerRadius(12)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(sermon.title)
-                    .font(.headline)
-
-                Text("Speaker: \(sermon.pastorName)")
-                    .font(.subheadline)
+            // Display YouTube Thumbnail if video URL is available
+            if let videoURL = sermon.videoURL, let thumbnailURL = getYouTubeThumbnailURL(videoURL: videoURL) {
+                
+                // Wrap AsyncImage with NavigationLink
+                NavigationLink(destination: SermonDetailView(sermon: sermon)) {
+                    AsyncImage(url: thumbnailURL) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(height: 200)
+                                .cornerRadius(10)
+                        } else if phase.error != nil {
+                            // Error placeholder
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 200)
+                                .foregroundColor(.red)
+                        } else {
+                            // Placeholder while loading
+                            ProgressView()
+                                .frame(height: 200)
+                        }
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())  // Ensure the link doesn't take the button style
+                
+            } else {
+                // Fallback if no video or thumbnail available
+                Text("No video available")
                     .foregroundColor(.gray)
-
-                Text(sermon.description)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
+                    .frame(height: 200)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 10)
+
+            // Sermon Title
+            Text(sermon.title)
+                .font(.headline)
+                .padding(.top, 8)
         }
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(radius: 4)
-        .padding(.vertical, 8)
+        .padding()
     }
 }
 
-struct SermonCardView_Previews: PreviewProvider {
-    static var previews: some View {
-        SermonCardView(sermon: Sermon(
-            id: UUID(),
-            title: "The Power of Faith",
-            description: "This is a test sermon description about faith and its importance in our lives.",
-            pastorName: "Pastor John Doe",
-            videoURL: nil,
-            audioURL: nil,
-            thumbnailName: "sampleImage"  // Make sure to add a sample image in your assets
-        ))
+// Place this function at the bottom or top of SermonCardView.swift
+private func getYouTubeThumbnailURL(videoURL: URL) -> URL? {
+    let urlString = videoURL.absoluteString
+
+    // Check if the URL is in the embedded format
+    if urlString.contains("embed/") {
+        // Extract video ID from embedded URL
+        guard let videoID = urlString.components(separatedBy: "embed/").last else {
+            return nil
+        }
+        
+        // Construct the thumbnail URL using the video ID
+        let thumbnailURLString = "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
+        return URL(string: thumbnailURLString)
+    } else if urlString.contains("v=") {
+        // Extract video ID from standard YouTube URL
+        guard let videoID = urlString.components(separatedBy: "v=").last else {
+            return nil
+        }
+        
+        // Construct the thumbnail URL using the video ID
+        let thumbnailURLString = "https://img.youtube.com/vi/\(videoID)/hqdefault.jpg"
+        return URL(string: thumbnailURLString)
     }
+
+    return nil
 }

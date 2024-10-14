@@ -25,7 +25,7 @@ struct StreamingViewContainer: View {
     var body: some View {
         VStack(spacing: 0) {
             // Add the banner at the top
-            BannerView()
+            BannerView(imageName: "banner", height: 100)
 
             // Add the WebView for streaming content
             StreamingView(url: url)
